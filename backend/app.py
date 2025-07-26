@@ -7,7 +7,9 @@ def create_app():
     app = Flask(__name__)
     
     # Enable CORS to allow your frontend to communicate with this backend
-    CORS(app)
+    CORS(app,
+         origins=["https://kannadagotta.wouldsoftware.com", "localhost:5001"],
+         supports_credentials=True)
     
     # Register the blueprint that contains all our API routes
     app.register_blueprint(api_bp, url_prefix='/api')
