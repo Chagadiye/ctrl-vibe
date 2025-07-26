@@ -1,236 +1,252 @@
 {
-    "tracks": [
-      {
-        "id": "survival",
-        "name": "Survival Kannada",
-        "description": "Essential phrases for daily life in Bengaluru.",
-        "lessons": [
-          {
-            "id": "s1",
-            "title": "Greetings",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ನಮಸ್ಕಾರ",
-              "english_translation": "Hello / Greetings",
-              "pronunciation_guide": "na-mas-kaa-ra"
-            }
-          },
-          {
-            "id": "s2",
-            "title": "Asking for Water",
-            "type": "mcq",
-            "content": {
-              "question": "How do you say 'Water please'?",
-              "options": ["ಸ್ವಲ್ಪ ನೀರು ಕೊಡಿ", "ಊಟ ಆಯ್ತಾ?", "ಇಲ್ಲಿ ಬನ್ನಿ"],
-              "correct_answer": "ಸ್ವಲ್ಪ ನೀರು ಕೊಡಿ"
-            }
-          },
-          {
-            "id": "s3",
-            "title": "Auto Directions 1",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ನೇರವಾಗಿ ಹೋಗಿ",
-              "english_translation": "Go straight",
-              "pronunciation_guide": "ne-ra-vaa-gi ho-gi"
-            }
-          },
-          {
-            "id": "s4",
-            "title": "Auto Directions 2",
-            "type": "mcq",
-            "content": {
-              "question": "To ask an auto driver to 'Stop here', you would say:",
-              "options": ["ಇಲ್ಲಿ ನಿಲ್ಲಿಸಿ", "ಎಷ್ಟು ಆಯ್ತು?", "ಚೆನ್ನಾಗಿದೆ"],
-              "correct_answer": "ಇಲ್ಲಿ ನಿಲ್ಲಿಸಿ"
-            }
-          },
-          {
-            "id": "s5",
-            "title": "How Much?",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ಎಷ್ಟು ಆಯ್ತು?",
-              "english_translation": "How much is it?",
-              "pronunciation_guide": "esh-tu aa-yi-tu"
-            }
-          },
-          {
-            "id": "s6",
-            "title": "Ordering Coffee",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ಒಂದು ಕಾಫಿ ಕೊಡಿ",
-              "english_translation": "Give one coffee",
-              "pronunciation_guide": "won-du coffee ko-di"
-            }
-          },
-          {
-            "id": "s7",
-            "title": "Shopping for Vegetables",
-            "type": "mcq",
-            "content": {
-              "question": "What phrase means '1 kg tomato'?",
-              "options": ["ಒಂದು ಕೆಜಿ ಟೊಮೇಟೊ", "ಸ್ವಲ್ಪ ಖಾರ ಕಮ್ಮಿ", "ಇದು ಬೇಡ"],
-              "correct_answer": "ಒಂದು ಕೆಜಿ ಟೊಮೇಟೊ"
-            }
-          },
-          {
-            "id": "s8",
-            "title": "Is it spicy?",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ಇದು ಖಾರ ಇದೆಯಾ?",
-              "english_translation": "Is this spicy?",
-              "pronunciation_guide": "i-du khaa-ra i-de-ya"
-            }
+  "tracks": [
+    {
+      "id": "survival",
+      "name": "Survival Kannada",
+      "description": "Essential phrases for daily life in Bengaluru.",
+      "difficulty": "beginner",
+      "lessons": [
+        {
+          "id": "s1",
+          "title": "Greetings",
+          "type": "repeat_after_me",
+          "content": {
+            "kannada_phrase": "ನಮಸ್ಕಾರ",
+            "english_translation": "Hello / Greetings",
+            "pronunciation_guide": "na-mas-kaa-ra",
+            "audio_url": null
           }
-        ],
-        "simulation": {
-          "id": "auto_driver_sim",
-          "name": "Auto Driver Negotiation",
-          "description": "Practice bargaining for a fair auto fare."
+        },
+        {
+          "id": "s2",
+          "title": "Asking for Water",
+          "type": "mcq",
+          "content": {
+            "question": "How do you say 'Water please'?",
+            "options": ["ಸ್ವಲ್ಪ ನೀರು ಕೊಡಿ", "ಊಟ ಆಯ್ತಾ?", "ಇಲ್ಲಿ ಬನ್ನಿ"],
+            "correct_answer": "ಸ್ವಲ್ಪ ನೀರು ಕೊಡಿ",
+            "explanation": "ಸ್ವಲ್ಪ (swalpa) means 'some', ನೀರು (neeru) means 'water', ಕೊಡಿ (kodi) means 'give'"
+          }
+        },
+        {
+          "id": "s3",
+          "title": "Fill in the Greeting",
+          "type": "fill_in_blank",
+          "content": {
+            "sentence": "______ , ಹೇಗಿದ್ದೀರಾ?",
+            "english_hint": "_____ , how are you?",
+            "correct_answer": "ನಮಸ್ಕಾರ",
+            "options": ["ನಮಸ್ಕಾರ", "ಧನ್ಯವಾದ", "ಕ್ಷಮಿಸಿ"]
+          }
+        },
+        {
+          "id": "s4",
+          "title": "Match the Translations",
+          "type": "word_matching",
+          "content": {
+            "pairs": [
+              {"kannada": "ನೀರು", "english": "Water"},
+              {"kannada": "ಊಟ", "english": "Food/Meal"},
+              {"kannada": "ಎಷ್ಟು", "english": "How much"},
+              {"kannada": "ಎಲ್ಲಿ", "english": "Where"}
+            ]
+          }
+        },
+        {
+          "id": "s5",
+          "title": "Listen and Choose",
+          "type": "listening_comprehension",
+          "content": {
+            "audio_text": "ಒಂದು ಕಾಫಿ ಕೊಡಿ",
+            "question": "What did you hear?",
+            "options": [
+              "Give me one coffee",
+              "Give me one tea",
+              "Give me water",
+              "How much is coffee?"
+            ],
+            "correct_answer": "Give me one coffee"
+          }
+        },
+        {
+          "id": "s6",
+          "title": "Translate to Kannada",
+          "type": "translation",
+          "content": {
+            "direction": "en_to_kn",
+            "source_text": "Thank you",
+            "correct_answers": ["ಧನ್ಯವಾದ", "ಧನ್ಯವಾದಗಳು"],
+            "hints": ["Think of 'dhanyavaada'"]
+          }
+        },
+        {
+          "id": "s7",
+          "title": "Auto Directions Practice",
+          "type": "sentence_building",
+          "content": {
+            "english_sentence": "Go straight and turn left",
+            "word_bank": ["ನೇರವಾಗಿ", "ಹೋಗಿ", "ಎಡಕ್ಕೆ", "ತಿರುಗಿ", "ಮತ್ತು"],
+            "correct_order": ["ನೇರವಾಗಿ", "ಹೋಗಿ", "ಮತ್ತು", "ಎಡಕ್ಕೆ", "ತಿರುಗಿ"]
+          }
         }
-      },
-      {
-        "id": "office",
-        "name": "Office Kannada",
-        "description": "Communicate effectively with colleagues.",
-        "lessons": [
-          {
-            "id": "o1",
-            "title": "Meeting Introduction",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ನಾನು ಮೀಟಿಂಗ್‌ಗೆ ಬಂದಿದ್ದೇನೆ",
-              "english_translation": "I have come for the meeting",
-              "pronunciation_guide": "naa-nu meeting-ge ban-did-de-ne"
-            }
-          },
-          {
-            "id": "o2",
-            "title": "Good Morning",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ಶುಭೋದಯ",
-              "english_translation": "Good morning",
-              "pronunciation_guide": "shu-bho-da-ya"
-            }
-          },
-          {
-            "id": "o3",
-            "title": "How are you?",
-            "type": "mcq",
-            "content": {
-              "question": "How do you ask 'How are you?'",
-              "options": ["ಚೆನ್ನಾಗಿದ್ದೀರಾ?", "ಊಟ ಆಯ್ತಾ?", "ನಾಳೆ ಸಿಗೋಣ"],
-              "correct_answer": "ಚೆನ್ನಾಗಿದ್ದೀರಾ?"
-            }
-          },
-          {
-            "id": "o4",
-            "title": "I am fine",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ಚೆನ್ನಾಗಿದ್ದೀನಿ",
-              "english_translation": "I am fine",
-              "pronunciation_guide": "chen-naa-gid-di-ni"
-            }
-          },
-          {
-            "id": "o5",
-            "title": "See you tomorrow",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ನಾಳೆ ಸಿಗೋಣ",
-              "english_translation": "Let's meet tomorrow / See you tomorrow",
-              "pronunciation_guide": "naa-le si-go-na"
-            }
-          },
-          {
-            "id": "o6",
-            "title": "Requesting Help",
-            "type": "mcq",
-            "content": {
-              "question": "To ask 'Can you help me?', you would say:",
-              "options": ["ಸ್ವಲ್ಪ ಸಹಾಯ ಮಾಡ್ತೀರಾ?", "ಕೆಲಸ ಮುಗೀತು", "ನನಗೆ ಗೊತ್ತಿಲ್ಲ"],
-              "correct_answer": "ಸ್ವಲ್ಪ ಸಹಾಯ ಮಾಡ್ತೀರಾ?"
-            }
-          }
-        ],
-        "simulation": {
-          "id": "salary_negotiation_sim",
-          "name": "Salary Negotiation",
-          "description": "Simulate a conversation with your manager."
-        }
-      },
-      {
-        "id": "culture",
-        "name": "Cultural Kannada",
-        "description": "Connect with local culture and festivals.",
-        "lessons": [
-          {
-            "id": "c1",
-            "title": "Festival Wishes",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ಹಬ್ಬದ ಶುಭಾಶಯಗಳು",
-              "english_translation": "Happy festival wishes",
-              "pronunciation_guide": "hab-ba-da shu-bhaa-sha-ya-ga-lu"
-            }
-          },
-          {
-            "id": "c2",
-            "title": "Have you eaten?",
-            "type": "mcq",
-            "content": {
-              "question": "What is the most common way to greet someone around lunchtime?",
-              "options": ["ಊಟ ಆಯ್ತಾ?", "ಚೆನ್ನಾಗಿದ್ದೀರಾ?", "ಹಬ್ಬದ ಶುಭಾಶಯಗಳು"],
-              "correct_answer": "ಊಟ ಆಯ್ತಾ?"
-            }
-          },
-          {
-            "id": "c3",
-            "title": "Addressing Elders",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ಹೌದು ಅಣ್ಣ",
-              "english_translation": "Yes, elder brother",
-              "pronunciation_guide": "how-du an-na"
-            }
-          },
-          {
-            "id": "c4",
-            "title": "Common Slang: Adjust",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ಸ್ವಲ್ಪ ಅಡ್ಜಸ್ಟ್ ಮಾಡಿ",
-              "english_translation": "Please adjust a little",
-              "pronunciation_guide": "swal-pa adjust maa-di"
-            }
-          },
-          {
-            "id": "c5",
-            "title": "Praising Food",
-            "type": "mcq",
-            "content": {
-              "question": "If the food is very tasty, you can say it's...",
-              "options": ["ಬೊಂಬಾಟ್ ಆಗಿದೆ", "ಖಾರ ಆಗಿದೆ", "ಇಷ್ಟ ಇಲ್ಲ"],
-              "correct_answer": "ಬೊಂಬಾಟ್ ಆಗಿದೆ"
-            }
-          },
-          {
-            "id": "c6",
-            "title": "Ugadi Wishes",
-            "type": "repeat_after_me",
-            "content": {
-              "kannada_phrase": "ಯುಗಾದಿ ಹಬ್ಬದ ಶುಭಾಶಯಗಳು",
-              "english_translation": "Happy Ugadi festival wishes",
-              "pronunciation_guide": "yu-gaa-di hab-ba-da shu-bhaa-sha-ya-ga-lu"
-            }
-          }
-        ]
+      ],
+      "simulation": {
+        "id": "auto_driver_sim",
+        "name": "Auto Driver Negotiation",
+        "description": "Practice bargaining for a fair auto fare.",
+        "difficulty": "intermediate"
       }
-    ]
-  }
-  
+    },
+    {
+      "id": "office",
+      "name": "Office Kannada",
+      "description": "Communicate effectively with colleagues.",
+      "difficulty": "intermediate",
+      "lessons": [
+        {
+          "id": "o1",
+          "title": "Meeting Introduction",
+          "type": "repeat_after_me",
+          "content": {
+            "kannada_phrase": "ನಾನು ಮೀಟಿಂಗ್‌ಗೆ ಬಂದಿದ್ದೇನೆ",
+            "english_translation": "I have come for the meeting",
+            "pronunciation_guide": "naa-nu meeting-ge ban-did-de-ne"
+          }
+        },
+        {
+          "id": "o2",
+          "title": "Office Vocabulary Match",
+          "type": "word_matching",
+          "content": {
+            "pairs": [
+              {"kannada": "ಕೆಲಸ", "english": "Work"},
+              {"kannada": "ಸಭೆ", "english": "Meeting"},
+              {"kannada": "ವರದಿ", "english": "Report"},
+              {"kannada": "ಯೋಜನೆ", "english": "Project"},
+              {"kannada": "ಗಡುವು", "english": "Deadline"}
+            ]
+          }
+        },
+        {
+          "id": "o3",
+          "title": "Complete the Request",
+          "type": "fill_in_blank",
+          "content": {
+            "sentence": "ಸ್ವಲ್ಪ ______ ಮಾಡ್ತೀರಾ?",
+            "english_hint": "Can you _____ me a little?",
+            "correct_answer": "ಸಹಾಯ",
+            "options": ["ಸಹಾಯ", "ಕೆಲಸ", "ಊಟ", "ಕಾಫಿ"]
+          }
+        }
+      ],
+      "simulation": {
+        "id": "salary_negotiation_sim",
+        "name": "Salary Negotiation",
+        "description": "Simulate a conversation with your manager.",
+        "difficulty": "advanced"
+      }
+    },
+    {
+      "id": "culture",
+      "name": "Cultural Kannada",
+      "description": "Connect with local culture and festivals.",
+      "difficulty": "beginner",
+      "lessons": [
+        {
+          "id": "c1",
+          "title": "Festival Wishes",
+          "type": "repeat_after_me",
+          "content": {
+            "kannada_phrase": "ಹಬ್ಬದ ಶುಭಾಶಯಗಳು",
+            "english_translation": "Happy festival wishes",
+            "pronunciation_guide": "hab-ba-da shu-bhaa-sha-ya-ga-lu"
+          }
+        },
+        {
+          "id": "c2",
+          "title": "Food Appreciation",
+          "type": "listening_comprehension",
+          "content": {
+            "audio_text": "ಊಟ ತುಂಬಾ ಚೆನ್ನಾಗಿದೆ",
+            "question": "What is being said about the food?",
+            "options": [
+              "The food is very good",
+              "The food is too spicy",
+              "I want more food",
+              "Where is the food?"
+            ],
+            "correct_answer": "The food is very good"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dating",
+      "name": "Dating & Social",
+      "description": "Navigate social situations and casual conversations.",
+      "difficulty": "intermediate",
+      "lessons": [
+        {
+          "id": "d1",
+          "title": "Compliments",
+          "type": "translation",
+          "content": {
+            "direction": "en_to_kn",
+            "source_text": "You look nice today",
+            "correct_answers": ["ನೀವು ಇವತ್ತು ಚೆನ್ನಾಗಿ ಕಾಣುತ್ತಿದ್ದೀರಿ"],
+            "hints": ["Use the respectful form"]
+          }
+        }
+      ],
+      "simulation": {
+        "id": "crush_conversation_sim",
+        "name": "Coffee Date",
+        "description": "Practice casual conversation with someone you like.",
+        "difficulty": "intermediate"
+      }
+    },
+    {
+      "id": "emergency",
+      "name": "Emergency Kannada",
+      "description": "Handle difficult situations including road incidents.",
+      "difficulty": "advanced",
+      "content_warning": "Contains strong language for emergency situations",
+      "age_restricted": true,
+      "lessons": [
+        {
+          "id": "e1",
+          "title": "Apologizing",
+          "type": "repeat_after_me",
+          "content": {
+            "kannada_phrase": "ಕ್ಷಮಿಸಿ, ನನ್ನ ತಪ್ಪು",
+            "english_translation": "Sorry, my mistake",
+            "pronunciation_guide": "ksha-mi-si, nan-na tap-pu"
+          }
+        },
+        {
+          "id": "e2",
+          "title": "Road Rage Vocabulary",
+          "type": "mcq",
+          "content": {
+            "question": "How do you firmly say 'Watch where you're going'?",
+            "options": [
+              "ಎಲ್ಲಿ ನೋಡಿ ಹೋಗ್ತಿದ್ದೀಯಾ?",
+              "ನಮಸ್ಕಾರ",
+              "ಧನ್ಯವಾದ",
+              "ಊಟ ಆಯ್ತಾ?"
+            ],
+            "correct_answer": "ಎಲ್ಲಿ ನೋಡಿ ಹೋಗ್ತಿದ್ದೀಯಾ?",
+            "explanation": "Use with caution - this is a strong expression"
+          }
+        }
+      ],
+      "simulation": {
+        "id": "road_rage_sim",
+        "name": "Road Incident Handler",
+        "description": "Learn to de-escalate tense traffic situations.",
+        "difficulty": "advanced",
+        "content_warning": true
+      }
+    }
+  ]
+}
