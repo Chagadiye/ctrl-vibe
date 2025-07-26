@@ -3,14 +3,14 @@ services:
     build:
       context: ./backend
     ports:
-      - "127.0.0.1:6969:6969"
+      - "6969:6969"
     restart: always
 
   frontend:
     build:
       context: ./frontend
     ports:
-      - "127.0.0.1:3000:3000"
+      - "3000:3000"
     depends_on:
       - backend
     restart: always

@@ -22,12 +22,7 @@ def create_app():
         })
     
     # Enable CORS
-    CORS(app,
-         origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
-         supports_credentials=True,
-         allow_headers=["Content-Type", "Authorization"],
-         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-    )
+    CORS(app)
     
     # Import and register blueprints with error handling
     try:
@@ -80,4 +75,4 @@ if __name__ == '__main__':
         methods = ','.join(rule.methods - {'HEAD', 'OPTIONS'})
         print(f"  {rule.rule} [{methods}]")
     
-    app.run(debug=(FLASK_ENV == 'development'), port=PORT, host='127.0.0.1')
+    app.run(debug=(FLASK_ENV == 'development'), port=PORT, host='0.0.0.0')
