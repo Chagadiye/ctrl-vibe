@@ -1,0 +1,194 @@
+{
+  "words": [
+    {
+      "label": "banana",
+      "kannada": "ಬಾಳೆಹಣ್ಣು",
+      "roman": "baale hannu",
+      "letters": [
+        "ಬಾ",
+        "ಳೆ",
+        "ಹ",
+        "ಣ್",
+        "ಣು"
+      ]
+    },
+    {
+      "label": "star",
+      "kannada": "ನಕ್ಷತ್ರ",
+      "roman": "nakshatra",
+      "letters": [
+        "ನ",
+        "ಕ್ಷ",
+        "ತ",
+        "್ರ"
+      ]
+    },
+    {
+      "label": "cat",
+      "kannada": "ಬೆಕ್ಕು",
+      "roman": "bekku",
+      "letters": [
+        "ಬೆ",
+        "ಕ್",
+        "ಕು"
+      ]
+    },
+    {
+      "label": "cup",
+      "kannada": "ಕಪ್",
+      "roman": "kap",
+      "letters": [
+        "ಕ",
+        "ಪ್"
+      ]
+    },
+    {
+      "label": "fish",
+      "kannada": "ಮೀನು",
+      "roman": "meenu",
+      "letters": [
+        "ಮೀ",
+        "ನು"
+      ]
+    },
+    {
+      "label": "car",
+      "kannada": "ಕಾರು",
+      "roman": "kaaru",
+      "letters": [
+        "ಕಾ",
+        "ರು"
+      ]
+    },
+    {
+      "label": "tree",
+      "kannada": "ಮರ",
+      "roman": "mara",
+      "letters": [
+        "ಮ",
+        "ರ"
+      ]
+    },
+    {
+      "label": "book",
+      "kannada": "ಪುಸ್ತಕ",
+      "roman": "pustaka",
+      "letters": [
+        "ಪು",
+        "ಸ್",
+        "ತ",
+        "ಕ"
+      ]
+    },
+    {
+      "label": "dog",
+      "kannada": "ನಾಯಿ",
+      "roman": "naayi",
+      "letters": [
+        "ನಾ",
+        "ಯಿ"
+      ]
+    },
+    {
+      "label": "pen",
+      "kannada": "ಪೆನ್",
+      "roman": "pen",
+      "letters": [
+        "ಪೆ",
+        "ನ್"
+      ]
+    },
+    {
+      "label": "house",
+      "kannada": "ಮನೆ",
+      "roman": "mane",
+      "letters": [
+        "ಮ",
+        "ನೆ"
+      ]
+    },
+    {
+      "label": "shoe",
+      "kannada": "ಬೂಟು",
+      "roman": "bootu",
+      "letters": [
+        "ಬೂ",
+        "ಟು"
+      ]
+    },
+    {
+      "label": "train",
+      "kannada": "ರೈಲು",
+      "roman": "railu",
+      "letters": [
+        "ರೈ",
+        "ಲು"
+      ]
+    },
+    {
+      "label": "sun",
+      "kannada": "ಸೂರ್ಯ",
+      "roman": "soorya",
+      "letters": [
+        "ಸೂ",
+        "ರ್",
+        "ಯ"
+      ]
+    },
+    {
+      "label": "bed",
+      "kannada": "ಹಾಸಿಗೆ",
+      "roman": "haasige",
+      "letters": [
+        "ಹಾ",
+        "ಸಿ",
+        "ಗೆ"
+      ]
+    },
+    {
+      "label": "hand",
+      "kannada": "ಕೈ",
+      "roman": "kai",
+      "letters": [
+        "ಕೈ"
+      ]
+    },
+    {
+      "label": "fan",
+      "kannada": "ಫ್ಯಾನ್",
+      "roman": "fyaan",
+      "letters": [
+        "ಫ್ಯಾ",
+        "ನ್"
+      ]
+    },
+    {
+      "label": "chair",
+      "kannada": "ಕುರ್ಚಿ",
+      "roman": "kurci",
+      "letters": [
+        "ಕು",
+        "ರ್",
+        "ಚಿ"
+      ]
+    },
+    {
+      "label": "apple",
+      "kannada": "ಸೇಬು",
+      "roman": "sebu",
+      "letters": [
+        "ಸೇ",
+        "ಬು"
+      ]
+    },
+    {
+      "label": "phone",
+      "kannada": "ಫೋನ್",
+      "roman": "phone",
+      "letters": [
+        "ಫೋ",
+        "ನ್"
+      ]
+    }
+  ]
+}

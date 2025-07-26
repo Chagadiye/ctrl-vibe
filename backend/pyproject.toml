@@ -9,4 +9,5 @@ dependencies = [
     "flask-cors>=6.0.1",
     "google-generativeai>=0.8.5",
     "python-dotenv>=1.1.1",
+    "quickdraw>=1.0.0",
 ]

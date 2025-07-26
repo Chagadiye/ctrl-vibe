@@ -25,3 +25,10 @@ export interface Lesson {
     lessons: Lesson[];
     simulation: Simulation;
   }
+
+export interface DuelRound {
+  kannada: string;
+  roman: string;
+  letters: string[];
+  image_base64: string;
+}
