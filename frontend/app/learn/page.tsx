@@ -1,0 +1,45 @@
+"use client";
+
+import { useEffect } from "react";
+import axios from "axios"; 
+import TrackSection from "@/components/TrackSection";
+import { useXPStore } from "@/store/xpStore";
+import { useTrackStore } from "@/store/trackStore";
+import { Track } from "@/lib/types"; 
+
+export default function LearnPage() {
+  const { xp } = useXPStore();
+  const { tracks, loading, error, fetchTracks } = useTrackStore();
+
+  useEffect(() => {
+    fetchTracks();
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="flex flex-col items-center justify-center min-h-screen p-4">
+        <p className="text-xl">Loading Kannada lessons...</p>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="flex flex-col items-center justify-center min-h-screen p-4">
+        <p className="text-xl text-destructive">Error loading lessons: {error}</p>
+        <p>Please make sure the backend server is running correctly.</p>
+      </main>
+    );
+  }
+
+  return (
+    <main className="flex flex-col items-center min-h-screen p-4">
+      <h1 className="text-4xl font-bold mb-4">Choose a Lesson</h1>
+      <p className="text-muted-foreground mb-8">Total XP: {xp}</p>
+
+      {tracks.map((track) => (
+        <TrackSection key={track.id} track={track} />
+      ))}
+    </main>
+  );
+}
