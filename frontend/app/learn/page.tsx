@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import axios from "axios"; 
 import TrackSection from "@/components/TrackSection";
 import { useXPStore } from "@/store/xpStore";
 import { useTrackStore } from "@/store/trackStore";
-import { Track } from "@/lib/types"; 
 
 export default function LearnPage() {
   const { xp, hasHydrated, loadXP } = useXPStore();
@@ -14,7 +12,7 @@ export default function LearnPage() {
   useEffect(() => {
     loadXP(); // Load XP from localStorage after hydration
     fetchTracks();
-  }, []);
+  }, [loadXP, fetchTracks]);
 
   if (loading) {
     return (

@@ -19,7 +19,7 @@ export default function LessonPage() {
     }
 
     return () => clear(); // Clean up on unmount
-  }, [trackId, lessonId]);
+  }, [trackId, lessonId, fetchLesson, clear]);
 
   if (!trackId || !lessonId) {
     return (

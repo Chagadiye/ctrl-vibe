@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
+import { Track } from "@/lib/types";
 
 type TrackStore = {
   tracks: Track[];

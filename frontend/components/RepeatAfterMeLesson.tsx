@@ -31,7 +31,7 @@ export default function RepeatAfterMeLesson({ lesson }: RepeatAfterMeLessonProps
           {lesson.content.kannada_phrase}
         </CardTitle>
         <CardDescription className="text-xl text-muted-foreground">
-          "{lesson.content.english_translation}"
+            &ldquo;{lesson.content.english_translation}&rdquo;
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-6">

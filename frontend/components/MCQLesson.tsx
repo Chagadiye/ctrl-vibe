@@ -31,8 +31,8 @@ export default function MCQLesson({ lesson }: MCQLessonProps) {
   const getButtonVariant = (option: string) => {
     if (!selectedOption) return "neutral";
     if (option === lesson.content.correct_answer) return "default";
-    if (option === selectedOption && !isCorrect) return "destructive";
-    return "outline";
+    if (option === selectedOption && !isCorrect) return "reverse";
+    return "noShadow";
   };
 
   return (
