@@ -7,7 +7,15 @@ requires-python = ">=3.12"
 dependencies = [
     "flask>=3.1.1",
     "flask-cors>=6.0.1",
-    "google-generativeai>=0.8.5",
     "python-dotenv>=1.1.1",
+    "flask-pymongo",
+    "pymongo",
+    "openai",
+    "google-generativeai",
+    "numpy",
+    "pydub",
+    "livekit",
+    "livekit-api",
+    "gunicorn",
     "quickdraw>=1.0.0",
 ]
