@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { Track, Lesson } from "@/lib/types";
+import { API } from "@/lib/utils";
 
 type LessonStore = {
   lesson: Lesson | null;

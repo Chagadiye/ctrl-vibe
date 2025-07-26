@@ -1,5 +1,3 @@
-// frontend/lib/types.ts
-
 // User and Progress Types
 export interface User {
     _id: string;
@@ -165,3 +163,9 @@ export interface User {
     correct: boolean;
   }
   
+export interface DuelRound {
+  kannada: string;
+  roman: string;
+  letters: string[];
+  image_base64: string;
+}

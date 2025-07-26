@@ -17,4 +17,5 @@ dependencies = [
     "livekit",
     "livekit-api",
     "gunicorn",
+    "quickdraw>=1.0.0",
 ]
