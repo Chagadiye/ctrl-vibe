@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { Track, Lesson } from "@/lib/types";
+import { API } from "@/lib/utils";
 
 type LessonStore = {
   lesson: Lesson | null;
@@ -18,7 +19,7 @@ export const useLessonStore = create<LessonStore>((set) => ({
     set({ loading: true, error: null, lesson: null });
     try {
       const response = await axios.get<Track>(
-        `http://localhost:5001/api/tracks/${trackId}`
+        `${API}/tracks/${trackId}`
       );
       const currentLesson = response.data.lessons.find(
         (l) => l.id === lessonId
