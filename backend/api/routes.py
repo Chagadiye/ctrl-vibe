@@ -1,7 +1,15 @@
 from flask import Blueprint, jsonify, request
-from core import lesson_manager, simulation_manager
+from core import lesson_manager, simulation_manager, duel_manager
 
 api_bp = Blueprint('api', __name__)
+
+
+@api_bp.route('/duel/round/<int:round_id>', methods=['GET'])
+def get_duel_round(round_id):
+    data = duel_manager.get_round(round_id)
+    if not data:
+        return jsonify({"error": "Invalid round or image issue"}), 404
+    return jsonify(data), 200
 
 @api_bp.route('/status', methods=['GET'])
 def status():
