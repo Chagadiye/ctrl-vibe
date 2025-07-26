@@ -8,10 +8,11 @@ import { useTrackStore } from "@/store/trackStore";
 import { Track } from "@/lib/types"; 
 
 export default function LearnPage() {
-  const { xp } = useXPStore();
+  const { xp, hasHydrated, loadXP } = useXPStore();
   const { tracks, loading, error, fetchTracks } = useTrackStore();
 
   useEffect(() => {
+    loadXP(); // Load XP from localStorage after hydration
     fetchTracks();
   }, []);
 
@@ -35,7 +36,9 @@ export default function LearnPage() {
   return (
     <main className="flex flex-col items-center min-h-screen p-4">
       <h1 className="text-4xl font-bold mb-4">Choose a Lesson</h1>
-      <p className="text-muted-foreground mb-8">Total XP: {xp}</p>
+      <p className="text-muted-foreground mb-8">
+        Total XP: {hasHydrated ? xp : 0}
+      </p>
 
       {tracks.map((track) => (
         <TrackSection key={track.id} track={track} />
