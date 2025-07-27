@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from "react";
@@ -18,17 +19,14 @@ export default function DuelPage() {
         gameState,
         score,
         timeLeft,
-        loading,
         error,
-        fetchRound,
         selectLetter,
         submitAnswer,
         nextRound,
         resetGame,
         setTimeLeft,
     } = useDuelStore();
-
-    const addXP = useXPStore((s) => s.addXP);
+    const addDuelXP = useXPStore((s) => s.addDuelXP); // Use the new function
 
     // Initialize game
     useEffect(() => {
@@ -43,7 +41,6 @@ export default function DuelPage() {
             }, 1000);
             return () => clearTimeout(timer);
         } else if (timeLeft === 0 && gameState === "playing") {
-            // Time's up, treat as wrong answer
             useDuelStore.setState({ gameState: "wrong" });
         }
     }, [timeLeft, gameState, setTimeLeft]);
@@ -51,9 +48,9 @@ export default function DuelPage() {
     // Award XP when answer is correct
     useEffect(() => {
         if (gameState === "correct") {
-            addXP(10);
+            addDuelXP(10); // Use the new function
         }
-    }, [gameState, addXP]);
+    }, [gameState, addDuelXP]);
 
     const handleLetterClick = (letter: string) => {
         selectLetter(letter);
@@ -67,11 +64,8 @@ export default function DuelPage() {
         nextRound();
     };
 
-
-    const isLetterDisabled = (letter: string, index: number) => {
-        // Count how many times this letter appears in the original letters
+    const isLetterDisabled = (letter: string) => {
         const letterCount = currentRound?.letters.filter(l => l === letter).length || 0;
-        // Count how many times this letter has been selected
         const selectedCount = selectedLetters.filter(l => l === letter).length;
         return selectedCount >= letterCount || gameState !== "playing";
     };
@@ -185,8 +179,10 @@ export default function DuelPage() {
             <Button
             key={`${letter}-${idx}`}
             onClick={() => handleLetterClick(letter)}
-            disabled={isLetterDisabled(letter, idx)}
-            variant={isLetterDisabled(letter, idx) ? "noShadow" : "neutral"}
+            // FIX: Remove the second argument 'idx' from the function call
+            disabled={isLetterDisabled(letter)}
+            // FIX: Remove the second argument 'idx' from this call as well
+            variant={isLetterDisabled(letter) ? "noShadow" : "neutral"}
             className="text-lg min-w-[3rem]"
             >
             {letter}
