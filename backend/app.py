@@ -6,6 +6,9 @@ def create_app():
     """Creates and configures the Flask application."""
     app = Flask(__name__)
     
+    # Configure CORS properly for development
+    CORS(app)
+    
     # Add a root route for testing
     @app.route('/')
     def index():
@@ -17,12 +20,11 @@ def create_app():
                 "/api/tracks", 
                 "/api/speech/synthesize",
                 "/api/speech/transcribe",
-                "/api/speech/evaluate"
+                "/api/speech/evaluate",
+                "/api/livekit/create-session",
+                "/api/livekit/end-session"
             ]
         })
-    
-    # Enable CORS
-    CORS(app)
     
     # Import and register blueprints with error handling
     try:
@@ -45,6 +47,14 @@ def create_app():
         print("✅ user_bp registered successfully")
     except Exception as e:
         print(f"❌ Failed to register user_bp: {e}")
+
+    try:
+        from api.livekit_routes import livekit_bp
+        app.register_blueprint(livekit_bp, url_prefix='/api/livekit')
+        print("✅ LiveKit routes registered")
+    except ImportError as e:
+        print(f"⚠️  LiveKit routes not available: {e}")
+        print("Voice simulations will use fallback mode")
     
     # Initialize MongoDB with error handling
     try:

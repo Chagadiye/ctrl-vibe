@@ -1,21 +1,15 @@
-// frontend/app/simulations/[simulationId]/page.tsx
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Card, CardTitle, CardContent } from "@/components/ui/card"; 
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Mic, MicOff, Volume2 } from "lucide-react"; 
+import { ArrowLeft, Phone, Trophy, AlertCircle } from "lucide-react";
+import VoiceConversation from "@/components/VoiceConversation";
 import axios from "axios";
 import { useXPStore } from "@/store/xpStore";
-import { ConversationMessage } from "@/lib/types"; 
 import { API } from "@/lib/utils";
-
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-  audioUrl?: string;
-}
+import { SimulationSession } from "@/lib/types";
 
 export default function SimulationPracticePage() {
   const router = useRouter();
@@ -24,143 +18,86 @@ export default function SimulationPracticePage() {
   const simulationId = params.simulationId as string;
   const ageVerified = searchParams.get('age_verified') === 'true';
   
-  const { userId } = useXPStore();
+  const { submitLesson } = useXPStore();
   
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [history, setHistory] = useState<ConversationMessage[]>([]); // Fixed type
-  const [recording, setRecording] = useState(false);
+  // Generate a demo user ID
+  const demoUserId = `demo_${Date.now()}`;
+  
+  const [session, setSession] = useState<SimulationSession | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [simulationEnded, setSimulationEnded] = useState(false);
-  const [score, setScore] = useState<number | null>(null);
-  const [feedback, setFeedback] = useState<Record<string, string> | null>(null); // Fixed type
-  
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-
+  const [score] = useState<number>(85);
+  const [preparing, setPreparing] = useState(true);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    const timer = setTimeout(() => {
+      setPreparing(false);
+    }, 3000);
 
-  const startSimulation = useCallback(async () => {
+    return () => clearTimeout(timer);
+  }, []);
+
+  const startSimulation = async () => {
     try {
       setLoading(true);
-      const response = await axios.post(`${API}/simulation/start`, {
+      setError(null);
+      
+      console.log("🚀 Starting simulation...");
+      console.log("API URL:", `${API}/livekit/create-session`);
+      
+      const response = await axios.post(`${API}/livekit/create-session`, {
         simulation_type: simulationId,
-        user_id: userId,
         age_verified: ageVerified
       });
       
-      const { text, audio_url, history: newHistory } = response.data;
-      
-      setMessages([{
-        role: "assistant",
-        content: text,
-        audioUrl: audio_url
-      }]);
-      setHistory(newHistory);
-      
-      // Auto-play first message
-      if (audio_url) {
-        playAudio(audio_url);
+      console.log("✅ Session created:", response.data);
+      setSession(response.data);
+    } catch (err: unknown) {
+      console.error("❌ Full error:", err);
+      let errorMessage = "Failed to start simulation.";
+      if (axios.isAxiosError(err)) {
+          console.error("❌ Response data:", err.response?.data);
+          errorMessage = err.response?.data?.error || `Failed to start simulation: ${err.message}`;
+      } else if (err instanceof Error) {
+          errorMessage = err.message;
       }
-    } catch (error) {
-      console.error("Error starting simulation:", error);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  }, [simulationId, userId, ageVerified])
-  
-  useEffect(() => {
-    startSimulation();
-  }, [startSimulation]);
-  
-  const playAudio = (audioUrl: string) => {
-    const audio = new Audio(audioUrl);
-    audio.play();
   };
+  const endSimulation = async () => {
+    if (!session) return;
 
-  const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-      };
-
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        await sendUserMessage(audioBlob);
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorder.start();
-      setRecording(true);
-    } catch (error) {
-      console.error("Error accessing microphone:", error);
-      alert("Please allow microphone access to use this feature.");
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && recording) {
-      mediaRecorderRef.current.stop();
-      setRecording(false);
-    }
-  };
-
-  const sendUserMessage = async (audioBlob: Blob) => {
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.webm');
-      formData.append('data', JSON.stringify({
-        simulation_type: simulationId,
-        history: history,
-        user_id: userId
-      }));
-
-      const response = await axios.post(`${API}/simulation/converse`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      console.log("🔚 Ending simulation...");
+      console.log("API URL:", `${API}/livekit/end-session`);
+      
+      // End the LiveKit session
+      await axios.post(`${API}/livekit/end-session`, {
+        room_name: session.room_name,
+        user_id: demoUserId
       });
 
-      const { text, audio_url, history: newHistory, end_conversation, score: simScore, feedback: simFeedback } = response.data;
-      
-      // Add user message (we don't show the actual text for now)
-      setMessages(prev => [...prev, {
-        role: "user",
-        content: "🎤 Audio message"
-      }]);
-      
-      // Add assistant response
-      setMessages(prev => [...prev, {
-        role: "assistant",
-        content: text,
-        audioUrl: audio_url
-      }]);
-      
-      setHistory(newHistory);
-      
-      // Auto-play response
-      if (audio_url) {
-        playAudio(audio_url);
+      // Submit score for XP (optional for demo)
+      try {
+        await submitLesson({
+          trackId: 'simulations',
+          lessonId: simulationId,
+          score: score,
+          timeSpent: 180
+        });
+      } catch (e) {
+        // Ignore XP submission errors in demo mode
+        console.log("XP submission skipped for demo");
       }
-      
-      // Check if simulation ended
-      if (end_conversation) {
-        setSimulationEnded(true);
-        setScore(simScore);
-        setFeedback(simFeedback);
-      }
-    } catch (error) {
-      console.error("Error sending message:", error);
-    } finally {
-      setLoading(false);
+
+      setSimulationEnded(true);
+    } catch (err) {
+      console.error("Error ending simulation:", err);
+      // Don't fail the UI if ending fails
+      setSimulationEnded(true);
     }
   };
 
@@ -169,11 +106,39 @@ export default function SimulationPracticePage() {
       auto_driver_sim: "Auto Driver Negotiation",
       salary_negotiation_sim: "Salary Negotiation",
       crush_conversation_sim: "Coffee Date",
-      road_rage_sim: "Road Incident"
+      road_rage_sim: "Road Incident Handler"
     };
     return titles[simulationId] || "Simulation";
   };
 
+  // Preparation screen
+  if (preparing) {
+    return (
+      <main className="flex flex-col items-center justify-center h-screen p-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="p-8 text-center">
+            <h2 className="text-2xl font-bold mb-4">Getting Ready...</h2>
+            <div className="mb-6">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-main flex items-center justify-center animate-pulse">
+                <Phone className="h-8 w-8 text-main-foreground" />
+              </div>
+              <p className="text-muted-foreground">
+                Preparing your {getSimulationTitle()} simulation
+              </p>
+            </div>
+            <div className="space-y-2 text-sm text-left">
+              <p>📱 Make sure your microphone is working</p>
+              <p>🎧 Use headphones for better experience</p>
+              <p>🗣️ Speak clearly and naturally</p>
+              <p>💡 Don&apos;t worry about perfect pronunciation</p>
+            </div>
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
+
+  // Main simulation interface
   return (
     <main className="flex flex-col h-screen bg-background">
       {/* Header */}
@@ -182,102 +147,97 @@ export default function SimulationPracticePage() {
           variant="default"
           size="sm"
           onClick={() => router.push('/simulations')}
+          disabled={!!session && !simulationEnded}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
         <h1 className="text-xl font-bold flex-1 text-center">{getSimulationTitle()}</h1>
+        <div className="text-sm text-green-600 font-medium">Live Mode</div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-2xl mx-auto space-y-4">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <Card className={`max-w-[80%] ${
-                message.role === 'user' ? 'bg-main text-main-foreground' : ''
-              }`}>
-                <CardContent className="p-4">
-                  <p className="text-sm font-semibold mb-2">
-                    {message.role === 'user' ? 'You' : 'AI'}
-                  </p>
-                  <p>{message.content}</p>
-                  {message.audioUrl && (
-                    <Button
-                      size="sm"
-                      variant="default"
-                      className="mt-2"
-                      onClick={() => playAudio(message.audioUrl!)}
-                    >
-                      <Volume2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          ))}
-          
-          {loading && (
-            <div className="text-center text-muted-foreground">
-              <p>Processing...</p>
-            </div>
-          )}
-          
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
+      {/* Content */}
+      <div className="flex-1 overflow-hidden">
+        {!session && !simulationEnded && (
+          <div className="h-full flex items-center justify-center p-4">
+            <Card className="max-w-md w-full">
+              <CardHeader>
+                <CardTitle>Ready to Practice?</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground">
+                  You&apos;ll have a voice conversation with an AI that plays the role of a {getSimulationTitle()}.
+                  Speak naturally in Kannada!
+                </p>
+                
+                {error && (
+                  <div className="p-3 bg-red-50 text-red-700 rounded-lg flex items-start gap-2">
+                    <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm">{error}</p>
+                  </div>
+                )}
+                
+                <Button
+                  onClick={startSimulation}
+                  disabled={loading}
+                  className="w-full"
+                  size="lg"
+                >
+                  {loading ? "Starting..." : "Start Conversation"}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
-      {/* Controls */}
-      {!simulationEnded ? (
-        <div className="p-4 border-t">
-          <div className="max-w-2xl mx-auto flex justify-center">
-            {!recording ? (
-              <Button
-                size="lg"
-                onClick={startRecording}
-                disabled={loading}
-              >
-                <Mic className="mr-2" />
-                Hold to Talk
-              </Button>
-            ) : (
-              <Button
-                size="lg"
-                variant="neutral"
-                onClick={stopRecording}
-              >
-                <MicOff className="mr-2" />
-                Release to Send
-              </Button>
-            )}
+        {session && !simulationEnded && (
+          <VoiceConversation
+            token={session.access_token}
+            serverUrl={session.livekit_url}
+            onDisconnect={endSimulation}
+            simulationInfo={session.simulation}
+          />
+        )}
+
+        {simulationEnded && (
+          <div className="h-full flex items-center justify-center p-4">
+            <Card className="max-w-md w-full">
+              <CardContent className="p-8 text-center">
+                <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
+                <h2 className="text-2xl font-bold mb-2">Great Job!</h2>
+                <p className="text-muted-foreground mb-6">
+                  You completed the {getSimulationTitle()} simulation
+                </p>
+                
+                <div className="space-y-3 mb-6">
+                  <div className="text-lg">
+                    Score: <span className="font-bold">{score}%</span>
+                  </div>
+                  <div className="text-lg">
+                    XP Earned: <span className="font-bold text-green-500">+{Math.floor(score * 1.5)}</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <Button
+                    onClick={() => router.push('/simulations')}
+                    className="w-full"
+                  >
+                    Try Another Simulation
+                  </Button>
+                  <Button
+                    variant="default"
+                    onClick={() => window.location.reload()}
+                    className="w-full"
+                  >
+                    Practice Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          <p className="text-center text-sm text-muted-foreground mt-2">
-            Click and hold to record your response
-          </p>
-        </div>
-      ) : (
-        /* Results */
-        <Card className="m-4 p-6">
-          <CardTitle className="text-center mb-4">Simulation Complete!</CardTitle>
-          <div className="space-y-2 text-center">
-            <p className="text-2xl font-bold">Score: {score}/100</p>
-            {feedback && Object.entries(feedback).map(([key, value]) => (
-              <p key={key} className="text-sm">
-                {key}: {value as string}
-              </p>
-            ))}
-            <Button
-              className="mt-4"
-              onClick={() => router.push('/simulations')}
-            >
-              Try Another Simulation
-            </Button>
-          </div>
-        </Card>
-      )}
+        )}
+      </div>
     </main>
   );
 }

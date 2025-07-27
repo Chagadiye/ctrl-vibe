@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@livekit/components-react": "^2.0.0",
+    "@livekit/components-styles": "^1.0.0",
+    "livekit-client": "^2.0.0",
     "@radix-ui/react-slot": "^1.2.3",
     "axios": "^1.11.0",
     "class-variance-authority": "^0.7.1",
