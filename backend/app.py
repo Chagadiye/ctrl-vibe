@@ -7,10 +7,7 @@ def create_app():
     app = Flask(__name__)
     
     # Configure CORS properly for development
-    CORS(app, 
-         origins=["http://localhost:3000", "http://127.0.0.1:3000"],
-         allow_headers=["Content-Type", "Authorization"],
-         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+    CORS(app)
     
     # Add a root route for testing
     @app.route('/')
