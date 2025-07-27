@@ -1,195 +1,198 @@
-// frontend/components/VoiceConversation.tsx
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import {
-  LiveKitRoom,
-  AudioConference,
+import { useEffect, useState } from "react";
+import { 
+  LiveKitRoom, 
+  useVoiceAssistant, 
+  BarVisualizer,
   RoomAudioRenderer,
-  useRoomContext,
-  useLocalParticipant,
-  useRemoteParticipants,
-  useTracks,
-  ConnectionState,
   useConnectionState,
-  ControlBar,
-  TrackToggle
+  useDataChannel,
+  useTracks
 } from "@livekit/components-react";
-import { Track, Room, RoomEvent } from "livekit-client";
-import { Card, CardContent } from "@/components/ui/card";
+import { ConnectionState, Track } from "livekit-client";
 import { Button } from "@/components/ui/button";
-import { Mic, MicOff, Volume2, Loader2, Phone, PhoneOff } from "lucide-react";
-import "@livekit/components-styles";
+import { Card, CardContent } from "@/components/ui/card";
+import { Mic, MicOff, Phone, PhoneOff } from "lucide-react";
 
 interface VoiceConversationProps {
   token: string;
   serverUrl: string;
   onDisconnect: () => void;
-  simulationInfo: any;
+  simulationInfo: {
+    title: string;
+    description: string;
+    tips: string[];
+  };
 }
 
-function ConversationRoom({ onDisconnect, simulationInfo }: { onDisconnect: () => void; simulationInfo: any }) {
-  const room = useRoomContext();
-  const { localParticipant } = useLocalParticipant();
-  const remoteParticipants = useRemoteParticipants();
+// Inner component that has access to LiveKit context
+function VoiceInterface({ onDisconnect, simulationInfo }: { 
+  onDisconnect: () => void; 
+  simulationInfo: VoiceConversationProps['simulationInfo'] 
+}) {
+  const { state, audioTrack } = useVoiceAssistant();
   const connectionState = useConnectionState();
-  const [isAgentSpeaking, setIsAgentSpeaking] = useState(false);
-  const [conversationStarted, setConversationStarted] = useState(false);
-  const [transcript, setTranscript] = useState<Array<{speaker: string, text: string}>>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [transcript, setTranscript] = useState<string[]>([]);
 
-  // Track remote participant audio activity
-  const audioTracks = useTracks([Track.Source.Microphone], {
-    updateOnlyOn: [RoomEvent.ActiveSpeakersChanged],
-  });
+  // Listen for transcription data
+  const { message } = useDataChannel();
 
   useEffect(() => {
-    // Mark conversation as started when agent joins
-    if (remoteParticipants.length > 0 && !conversationStarted) {
-      setConversationStarted(true);
+    if (connectionState === ConnectionState.Connected) {
+      setIsConnected(true);
     }
-  }, [remoteParticipants, conversationStarted]);
+  }, [connectionState]);
 
   useEffect(() => {
-    // Monitor speaking activity
-    const activeSpeakers = room.activeSpeakers;
-    const agentSpeaking = activeSpeakers.some(speaker => 
-      speaker.identity !== localParticipant.identity
-    );
-    setIsAgentSpeaking(agentSpeaking);
-  }, [room.activeSpeakers, localParticipant]);
+    if (message) {
+      try {
+        const data = JSON.parse(message);
+        if (data.type === 'transcript') {
+          setTranscript(prev => [...prev.slice(-5), data.content]); // Keep last 6 messages
+        }
+      } catch (e) {
+        // Ignore parsing errors
+      }
+    }
+  }, [message]);
 
-  const handleDisconnect = async () => {
-    await room.disconnect();
-    onDisconnect();
+  const getConnectionStatusColor = () => {
+    switch (connectionState) {
+      case ConnectionState.Connected:
+        return "text-green-600";
+      case ConnectionState.Connecting:
+        return "text-yellow-600";
+      case ConnectionState.Disconnected:
+        return "text-red-600";
+      default:
+        return "text-gray-600";
+    }
+  };
+
+  const getConnectionStatusText = () => {
+    switch (connectionState) {
+      case ConnectionState.Connected:
+        return "Connected";
+      case ConnectionState.Connecting:
+        return "Connecting...";
+      case ConnectionState.Disconnected:
+        return "Disconnected";
+      default:
+        return "Unknown";
+    }
   };
 
   return (
     <div className="flex flex-col h-full">
-      {/* Connection Status */}
-      {connectionState !== ConnectionState.Connected && (
-        <div className="text-center p-4">
-          <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
-          <p className="text-muted-foreground">Connecting to conversation...</p>
+      {/* Header */}
+      <div className="p-4 border-b bg-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">{simulationInfo.title}</h2>
+            <p className={`text-sm ${getConnectionStatusColor()}`}>
+              {getConnectionStatusText()}
+            </p>
+          </div>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={onDisconnect}
+            className="flex items-center gap-2"
+          >
+            <PhoneOff className="h-4 w-4" />
+            End Call
+          </Button>
         </div>
-      )}
+      </div>
 
-      {/* Main Content */}
-      {connectionState === ConnectionState.Connected && (
-        <>
-          {/* Agent Status */}
-          <div className="flex-1 flex flex-col items-center justify-center p-8">
-            <div className="relative mb-8">
-              <div className={`w-32 h-32 rounded-full flex items-center justify-center transition-all ${
-                isAgentSpeaking 
-                  ? 'bg-green-500 animate-pulse' 
-                  : 'bg-gray-200'
-              }`}>
-                <Volume2 className={`h-16 w-16 ${isAgentSpeaking ? 'text-white' : 'text-gray-400'}`} />
-              </div>
-              {isAgentSpeaking && (
-                <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
-                  <p className="text-sm font-semibold">AI is speaking...</p>
-                </div>
+      {/* Main Voice Interface */}
+      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-blue-50 to-purple-50">
+        {!isConnected ? (
+          <div className="text-center">
+            <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center animate-pulse">
+              <Phone className="h-12 w-12 text-blue-600" />
+            </div>
+            <p className="text-lg text-gray-600">Connecting to your simulation...</p>
+          </div>
+        ) : (
+          <div className="text-center space-y-6">
+            {/* Voice Visualizer */}
+            <div className="w-32 h-32 mx-auto">
+              {audioTrack && (
+                <BarVisualizer 
+                  state={state}
+                  barCount={12}
+                  trackRef={audioTrack}
+                  className="w-full h-full"
+                />
               )}
             </div>
 
-            {!conversationStarted ? (
-              <p className="text-lg text-muted-foreground">Waiting for AI agent...</p>
-            ) : (
-              <>
-                <h3 className="text-xl font-semibold mb-2">{simulationInfo.title}</h3>
-                <p className="text-muted-foreground mb-6">{simulationInfo.description}</p>
-                
-                {/* Tips */}
-                <Card className="w-full max-w-md mb-6">
-                  <CardContent className="p-4">
-                    <h4 className="font-semibold mb-2">Quick Tips:</h4>
-                    <ul className="text-sm space-y-1">
-                      {simulationInfo.tips?.map((tip: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <span className="text-green-500">•</span>
-                          <span>{tip}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              </>
+            {/* Status */}
+            <div className="space-y-2">
+              <p className="text-xl font-medium text-gray-800">
+                {state === 'listening' ? '🎤 Listening...' : 
+                 state === 'thinking' ? '🤔 Processing...' :
+                 state === 'speaking' ? '🗣️ Speaking...' : 
+                 '💬 Ready to chat'}
+              </p>
+              <p className="text-sm text-gray-600">
+                Speak naturally in Kannada mixed with English
+              </p>
+            </div>
+
+            {/* Recent Transcript */}
+            {transcript.length > 0 && (
+              <Card className="max-w-md mx-auto">
+                <CardContent className="p-4">
+                  <h4 className="text-sm font-medium mb-2">Recent conversation:</h4>
+                  <div className="space-y-1 text-sm">
+                    {transcript.map((msg, idx) => (
+                      <p key={idx} className="text-gray-700">{msg}</p>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </div>
+        )}
+      </div>
 
-          {/* Audio Renderer - Hidden but necessary */}
-          <RoomAudioRenderer />
+      {/* Tips */}
+      <div className="p-4 bg-gray-50 border-t">
+        <h4 className="text-sm font-medium mb-2">💡 Tips:</h4>
+        <ul className="text-xs text-gray-600 space-y-1">
+          {simulationInfo.tips.map((tip, idx) => (
+            <li key={idx}>• {tip}</li>
+          ))}
+        </ul>
+      </div>
 
-          {/* Controls */}
-          <div className="border-t p-4">
-            <div className="max-w-md mx-auto flex items-center justify-center gap-4">
-              <TrackToggle 
-                source={Track.Source.Microphone}
-                showIcon={false}
-              >
-                {({ enabled, pending, onClick }) => (
-                  <Button
-                    onClick={onClick}
-                    disabled={pending}
-                    variant={enabled ? "default" : "destructive"}
-                    size="lg"
-                    className="rounded-full w-16 h-16"
-                  >
-                    {enabled ? <Mic className="h-6 w-6" /> : <MicOff className="h-6 w-6" />}
-                  </Button>
-                )}
-              </TrackToggle>
-
-              <Button
-                onClick={handleDisconnect}
-                variant="destructive"
-                size="lg"
-                className="rounded-full w-16 h-16"
-              >
-                <PhoneOff className="h-6 w-6" />
-              </Button>
-            </div>
-            
-            <p className="text-center text-sm text-muted-foreground mt-4">
-              {conversationStarted 
-                ? "Speak naturally in Kannada. The AI will respond."
-                : "Connecting to AI agent..."
-              }
-            </p>
-          </div>
-        </>
-      )}
+      {/* Audio renderer for playback */}
+      <RoomAudioRenderer />
     </div>
   );
 }
 
-export default function VoiceConversation({ token, serverUrl, onDisconnect, simulationInfo }: VoiceConversationProps) {
+export default function VoiceConversation({ 
+  token, 
+  serverUrl, 
+  onDisconnect, 
+  simulationInfo 
+}: VoiceConversationProps) {
   return (
     <LiveKitRoom
       token={token}
       serverUrl={serverUrl}
-      connectOptions={{
-        autoSubscribe: true,
-        publishDefaults: {
-          audioPreset: {
-            maxBitrate: 32000,
-          },
-        },
-      }}
-      options={{
-        adaptiveStream: true,
-        dynacast: true,
-        publishDefaults: {
-          simulcast: false,
-        },
-      }}
+      connect={true}
       audio={true}
       video={false}
       onDisconnected={onDisconnect}
       className="h-full"
     >
-      <ConversationRoom onDisconnect={onDisconnect} simulationInfo={simulationInfo} />
+      <VoiceInterface onDisconnect={onDisconnect} simulationInfo={simulationInfo} />
     </LiveKitRoom>
   );
 }

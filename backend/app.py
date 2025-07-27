@@ -6,6 +6,12 @@ def create_app():
     """Creates and configures the Flask application."""
     app = Flask(__name__)
     
+    # Configure CORS properly for development
+    CORS(app, 
+         origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+         allow_headers=["Content-Type", "Authorization"],
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+    
     # Add a root route for testing
     @app.route('/')
     def index():
@@ -17,12 +23,11 @@ def create_app():
                 "/api/tracks", 
                 "/api/speech/synthesize",
                 "/api/speech/transcribe",
-                "/api/speech/evaluate"
+                "/api/speech/evaluate",
+                "/api/livekit/create-session",
+                "/api/livekit/end-session"
             ]
         })
-    
-    # Enable CORS
-    CORS(app)
     
     # Import and register blueprints with error handling
     try:

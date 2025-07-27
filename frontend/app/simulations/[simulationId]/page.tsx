@@ -7,11 +7,12 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Phone, Trophy, AlertCircle } from "lucide-react";
 import VoiceConversation from "@/components/VoiceConversation";
+import DemoVoiceConversation from "@/components/DemoVoiceConversation";
 import axios from "axios";
 import { useXPStore } from "@/store/xpStore";
 import { API } from "@/lib/utils"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6969";
+// Use direct URL instead of importing API from utils to avoid double path issue
 
 interface SimulationSession {
   room_name: string;
@@ -56,15 +57,20 @@ export default function SimulationPracticePage() {
       setLoading(true);
       setError(null);
       
+      console.log("🚀 Starting simulation...");
+      console.log("API URL:", `${API}/livekit/create-session`);
+      
       const response = await axios.post(`${API}/livekit/create-session`, {
-        user_id: demoUserId, // Use demo user ID
         simulation_type: simulationId,
         age_verified: ageVerified
       });
       
+      console.log("✅ Session created:", response.data);
       setSession(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to start simulation");
+      console.error("❌ Full error:", err);
+      console.error("❌ Response data:", err.response?.data);
+      setError(err.response?.data?.error || `Failed to start simulation: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -74,8 +80,11 @@ export default function SimulationPracticePage() {
     if (!session) return;
 
     try {
+      console.log("🔚 Ending simulation...");
+      console.log("API URL:", `${API}/livekit/end-session`);
+      
       // End the LiveKit session
-      await axios.post(`${API_URL}/api/livekit/end-session`, {
+      await axios.post(`${API}/livekit/end-session`, {
         room_name: session.room_name,
         user_id: demoUserId
       });
@@ -96,6 +105,8 @@ export default function SimulationPracticePage() {
       setSimulationEnded(true);
     } catch (err) {
       console.error("Error ending simulation:", err);
+      // Don't fail the UI if ending fails
+      setSimulationEnded(true);
     }
   };
 
@@ -142,7 +153,7 @@ export default function SimulationPracticePage() {
       {/* Header */}
       <div className="flex items-center gap-4 p-4 border-b">
         <Button
-          variant="noShadow"
+          variant="default"
           size="sm"
           onClick={() => router.push('/simulations')}
           disabled={!!session && !simulationEnded}
@@ -151,7 +162,7 @@ export default function SimulationPracticePage() {
           Back
         </Button>
         <h1 className="text-xl font-bold flex-1 text-center">{getSimulationTitle()}</h1>
-        <div className="text-sm text-green-600 font-medium">Demo Mode</div>
+        <div className="text-sm text-green-600 font-medium">Live Mode</div>
       </div>
 
       {/* Content */}
@@ -224,7 +235,7 @@ export default function SimulationPracticePage() {
                     Try Another Simulation
                   </Button>
                   <Button
-                    variant="default"
+                    variant="outline"
                     onClick={() => window.location.reload()}
                     className="w-full"
                   >

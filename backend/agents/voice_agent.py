@@ -1,20 +1,79 @@
 # backend/agents/voice_agent.py
 import asyncio
 import logging
-from typing import Dict, Optional
-from livekit import agents, rtc
-from livekit.agents import JobContext, WorkerOptions, cli
-from livekit.plugins import openai, silero
-from config import OPENAI_API_KEY, LIVEKIT_API_KEY, LIVEKIT_API_SECRET, LIVEKIT_URL
 import json
+from dotenv import load_dotenv
+from livekit import agents
+from livekit.agents import AgentSession, Agent, RoomInputOptions, ChatContext, JobContext
+from livekit.plugins import (
+    openai,
+    silero,
+)
+from config import OPENAI_API_KEY, LIVEKIT_API_KEY, LIVEKIT_API_SECRET, LIVEKIT_URL
 
+load_dotenv()
 logger = logging.getLogger(__name__)
 
-class KannadaSimulationAgent:
-    def __init__(self):
-        self.simulations = {
-            "auto_driver_sim": {
-                "system_prompt": """You are Manjunath, a friendly but firm auto-rickshaw driver in Bengaluru.
+class KannadaSimulationAgent(Agent):
+    def __init__(self, simulation_config: dict) -> None:
+        self._tasks = []
+        self.config = simulation_config
+        self._session = None
+        # Use the system prompt from config
+        super().__init__(instructions=simulation_config["system_prompt"])
+    
+    def set_session(self, session):
+        """Set the session reference so we can use session.say()"""
+        self._session = session
+    
+    async def on_enter(self):
+        """Called when the agent enters the room"""
+        logger.info(f"Agent entered room for simulation: {self.config.get('name', 'unknown')}")
+        
+        # Wait a moment for connection to stabilize
+        await asyncio.sleep(2.0)
+        
+        # Send initial greeting
+        if self._session:
+            logger.info(f"Sending initial message: {self.config['initial_message']}")
+            await self._session.say(self.config["initial_message"])
+        else:
+            logger.warning("No session reference available")
+
+    async def on_user_speech_committed(self, user_msg):
+        """Called when user speech is committed (STT complete)"""
+        logger.info(f"User said: {user_msg.content}")
+        
+        # Generate response using the LLM
+        chat_ctx = ChatContext()
+        chat_ctx.messages.append(user_msg)
+        
+        # Add system context about the simulation
+        system_msg = f"""You are in a {self.config['name']} simulation. 
+        Current context: {self.config.get('description', '')}
+        
+        Remember to:
+        - Stay in character
+        - Respond naturally and conversationally
+        - Keep responses short (1-2 sentences)
+        - Use the language style specified in your system prompt
+        """
+        
+        response = await self._session.llm.generate_reply(
+            messages=chat_ctx.messages,
+            system_prompt=system_msg + "\n\n" + self.config["system_prompt"]
+        )
+        
+        logger.info(f"Agent responding: {response.content}")
+        await self._session.say(response.content)
+
+def get_simulation_config(simulation_type: str) -> dict:
+    """Get configuration for a specific simulation"""
+    simulations = {
+        "auto_driver_sim": {
+            "name": "Auto Driver Simulation",
+            "description": "Auto-rickshaw negotiation in Bengaluru",
+            "system_prompt": """You are Manjunath, a friendly but firm auto-rickshaw driver in Bengaluru.
 - Speak ONLY in simple Kannada mixed with occasional English words
 - Start by asking "ಎಲ್ಲಿಗೆ ಹೋಗಬೇಕು sir/madam?" (Where do you want to go?)
 - Quote a fare that's 150-200% of actual (e.g., Majestic to Koramangala = ₹300-400)
@@ -25,12 +84,14 @@ class KannadaSimulationAgent:
   - "ಸರಿ ಸರಿ, last ₹180" (OK OK, final 180)
 - Keep responses SHORT (1-2 sentences)
 - End when price is agreed with "ಸರಿ, ಹತ್ತಿ" (OK, get in)""",
-                "voice": "alloy",
-                "initial_message": "ನಮಸ್ಕಾರ sir, ಎಲ್ಲಿಗೆ ಹೋಗಬೇಕು?"
-            },
-            
-            "salary_negotiation_sim": {
-                "system_prompt": """You are a tech manager in a Bengaluru IT company having a salary discussion.
+            "voice": "alloy",
+            "initial_message": "ನಮಸ್ಕಾರ sir, ಎಲ್ಲಿಗೆ ಹೋಗಬೇಕು?"
+        },
+        
+        "salary_negotiation_sim": {
+            "name": "Salary Negotiation Simulation", 
+            "description": "Tech salary discussion in Bengaluru IT company",
+            "system_prompt": """You are a tech manager in a Bengaluru IT company having a salary discussion.
 - Speak in Kanglish (mix of Kannada and English)
 - Be professional but understanding
 - Ask about achievements: "So, ನಿಮ್ಮ contributions ಏನು ಇದೆ this year?"
@@ -38,12 +99,14 @@ class KannadaSimulationAgent:
 - Offer realistic increments (10-20%)
 - Use corporate Kannada phrases
 - Keep responses conversational and realistic""",
-                "voice": "echo",
-                "initial_message": "Hi, ಬನ್ನಿ ಬನ್ನಿ. Salary discussion ಗೆ ಬಂದಿದ್ದೀರಾ? Please sit."
-            },
-            
-            "crush_conversation_sim": {
-                "system_prompt": """You are Priya/Prakash meeting someone at a coffee shop in Koramangala.
+            "voice": "echo",
+            "initial_message": "Hi, ಬನ್ನಿ ಬನ್ನಿ. Salary discussion ಗೆ ಬಂದಿದ್ದೀರಾ? Please sit."
+        },
+        
+        "crush_conversation_sim": {
+            "name": "Crush Conversation Simulation",
+            "description": "Coffee shop conversation in Koramangala",
+            "system_prompt": """You are Priya/Prakash meeting someone at a coffee shop in Koramangala.
 - Be friendly, warm, and encouraging
 - Speak simple Kannada with English mix
 - Ask about their interests: "ನಿಮಗೆ Bengaluru ಇಷ್ಟ ಆಯ್ತಾ?"
@@ -51,12 +114,14 @@ class KannadaSimulationAgent:
 - Share about favorite places, food, movies
 - Keep it light and fun
 - React positively to their responses""",
-                "voice": "nova",
-                "initial_message": "Hi! ನೀವು ಬಂದಿದ್ದೀರಾ? Coffee order ಮಾಡೋಣಾ?"
-            },
-            
-            "road_rage_sim": {
-                "system_prompt": """You are another driver who just had a minor traffic incident.
+            "voice": "nova",
+            "initial_message": "Hi! ನೀವು ಬಂದಿದ್ದೀರಾ? Coffee order ಮಾಡೋಣಾ?"
+        },
+        
+        "road_rage_sim": {
+            "name": "Road Rage De-escalation Simulation",
+            "description": "Traffic incident de-escalation practice",
+            "system_prompt": """You are another driver who just had a minor traffic incident.
 - Start mildly agitated: "ಏಯ್! ಏನು ಮಾಡ್ತಿದ್ದೀಯಾ?"
 - Use firm but not abusive language
 - If they apologize, gradually calm down
@@ -66,104 +131,98 @@ class KannadaSimulationAgent:
   - "ಸ್ವಲ್ಪ carefully drive ಮಾಡಿ" (Drive a bit carefully)
 - End peacefully if handled well: "ಸರಿ, next time careful ಆಗಿ"
 - Keep emotional but not extreme""",
-                "voice": "onyx",
-                "initial_message": "ಏಯ್! ಏನು ಮಾಡ್ತಿದ್ದೀಯಾ? Signal ಕೊಡದೆ brake ಹಾಕಿದ್ಯಾ?"
-            }
+            "voice": "onyx", 
+            "initial_message": "ಏಯ್! ಏನು ಮಾಡ್ತಿದ್ದೀಯಾ? Signal ಕೊಡದೆ brake ಹಾಕಿದ್ಯಾ?"
         }
-        
-        # Chat context and conversation state
-        self.chat_messages = []
-        self.current_simulation = None
-        self.conversation_active = False
+    }
     
-    def get_simulation_config(self, simulation_type: str) -> Dict:
-        """Get configuration for a specific simulation"""
-        return self.simulations.get(simulation_type, self.simulations["auto_driver_sim"])
+    return simulations.get(simulation_type, simulations["auto_driver_sim"])
 
-async def entrypoint(ctx: JobContext):
+async def entrypoint(ctx: agents.JobContext):
     """Main entry point for the LiveKit agent"""
     logger.info(f"Agent started for room: {ctx.room.name}")
     
     # Parse simulation type from room metadata
-    room_metadata = json.loads(ctx.room.metadata) if ctx.room.metadata else {}
-    simulation_type = room_metadata.get("simulation_type", "auto_driver_sim")
-    user_id = room_metadata.get("user_id", "unknown")
+    try:
+        room_metadata = json.loads(ctx.room.metadata) if ctx.room.metadata else {}
+        simulation_type = room_metadata.get("simulation_type", "auto_driver_sim")
+        user_id = room_metadata.get("user_id", "unknown")
+    except (json.JSONDecodeError, TypeError):
+        simulation_type = "auto_driver_sim"
+        user_id = "unknown"
     
     logger.info(f"Starting {simulation_type} for user {user_id}")
     
-    # Initialize the Kannada simulation agent
-    kannada_agent = KannadaSimulationAgent()
-    config = kannada_agent.get_simulation_config(simulation_type)
-    kannada_agent.current_simulation = simulation_type
+    # Get simulation configuration
+    config = get_simulation_config(simulation_type)
     
-    # Initialize plugins
-    initial_ctx = agents.llm.ChatContext().append(
-        role="system",
-        text=config["system_prompt"]
-    )
+    # Create the simulation agent
+    agent = KannadaSimulationAgent(config)
     
-    # Create the agent
-    agent = agents.MultimodalAgent(
-        model=openai.realtime.RealtimeModel(
-            api_key=OPENAI_API_KEY,
-            voice=config["voice"],
-            temperature=0.8,
-            instructions=config["system_prompt"],
-            modalities=["text", "audio"],
+    # Create agent session with the pipeline components
+    session = AgentSession(
+        stt=openai.STT(
+            model="gpt-4o-transcribe",
+            language="en",  # Whisper can handle multilingual including Kannada
         ),
-        chat_ctx=initial_ctx,
+        llm=openai.LLM(
+            model="gpt-4.1-2025-04-14",
+            temperature=0.8
+        ),
+        tts=openai.TTS(
+            voice=config["voice"],
+            model="gpt-4o-mini-tts",
+            speed=1.0,
+        ),
+        vad=silero.VAD.load(),
     )
     
-    # Connect to the room
-    await ctx.connect(auto_subscribe=agents.AutoSubscribe.AUDIO_ONLY)
+    # Connect to room
+    await ctx.connect()
     
-    # Start the agent
-    agent.start(ctx.room)
+    # Set the session reference in the agent so it can use session.say()
+    agent.set_session(session)
     
-    # Send initial greeting after a short delay
-    await asyncio.sleep(2.0)
-    await agent.say(config["initial_message"])
-    
-    # Track conversation metrics
-    conversation_start = asyncio.get_event_loop().time()
-    turn_count = 0
-    
-    # Event handlers
-    @ctx.room.on("participant_connected")
-    def on_participant_connected(participant: rtc.RemoteParticipant):
-        logger.info(f"Participant connected: {participant.identity}")
-    
-    @ctx.room.on("participant_disconnected") 
-    def on_participant_disconnected(participant: rtc.RemoteParticipant):
-        logger.info(f"Participant disconnected: {participant.identity}")
-    
-    @ctx.room.on("track_published")
-    def on_track_published(publication: rtc.RemoteTrackPublication, participant: rtc.RemoteParticipant):
-        logger.info(f"Track published: {publication.kind} by {participant.identity}")
-        nonlocal turn_count
-        turn_count += 1
-    
-    # Keep the agent running
+    # Start the session
     try:
-        await asyncio.sleep(300)  # 5 minute max conversation
-    except asyncio.CancelledError:
-        logger.info("Agent cancelled")
+        await session.start(
+            room=ctx.room,
+            agent=agent,
+            room_input_options=RoomInputOptions(
+                # Add any additional options here
+            ),
+        )
+        
+        logger.info(f"Session started successfully for {config['name']}")
+        
+        # Keep the session running
+        await asyncio.sleep(3600)  # 1 hour max conversation
+        
+    except Exception as e:
+        logger.error(f"Session failed: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
     finally:
-        # Calculate conversation metrics
-        duration = asyncio.get_event_loop().time() - conversation_start
-        logger.info(f"Conversation ended - Duration: {duration}s, Turns: {turn_count}")
+        logger.info("Session ended")
 
 def run_agent():
     """Run the LiveKit agent"""
-    cli.run_app(
-        WorkerOptions(
-            entrypoint_fnc=entrypoint,
-            api_key=LIVEKIT_API_KEY,
-            api_secret=LIVEKIT_API_SECRET,
-            ws_url=LIVEKIT_URL,
+    try:
+        agents.cli.run_app(
+            agents.WorkerOptions(
+                entrypoint_fnc=entrypoint,
+                api_key=LIVEKIT_API_KEY,
+                api_secret=LIVEKIT_API_SECRET,
+                ws_url=LIVEKIT_URL,
+            )
         )
-    )
+    except Exception as e:
+        logger.error(f"Failed to run agent: {e}")
+        raise
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     run_agent()
