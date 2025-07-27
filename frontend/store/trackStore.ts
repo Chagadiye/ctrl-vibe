@@ -2,8 +2,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { Track } from "@/lib/types";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6969";
+import { API } from "@/lib/utils";
 
 interface TrackStore {
   tracks: Track[];
@@ -22,7 +21,7 @@ export const useTrackStore = create<TrackStore>((set, get) => ({
   fetchTracks: async () => {
     set({ loading: true, error: null });
     try {
-      const res = await axios.get<Track[]>(`${API_URL}/api/tracks`);
+      const res = await axios.get<Track[]>(`${API}/tracks`);
       set({ tracks: res.data, loading: false });
     } catch (err: any) {
       set({ 

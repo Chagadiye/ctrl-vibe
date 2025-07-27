@@ -9,8 +9,7 @@ import { ArrowLeft, Mic, MicOff, Volume2 } from "lucide-react";
 import axios from "axios";
 import { useXPStore } from "@/store/xpStore";
 import { ConversationMessage } from "@/lib/types"; 
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6969";
+import { API } from "@/lib/utils";
 
 interface Message {
   role: "user" | "assistant";
@@ -48,7 +47,7 @@ export default function SimulationPracticePage() {
   const startSimulation = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.post(`${API_URL}/api/simulation/start`, {
+      const response = await axios.post(`${API}/simulation/start`, {
         simulation_type: simulationId,
         user_id: userId,
         age_verified: ageVerified
@@ -126,7 +125,7 @@ export default function SimulationPracticePage() {
         user_id: userId
       }));
 
-      const response = await axios.post(`${API_URL}/api/simulation/converse`, formData, {
+      const response = await axios.post(`${API}/simulation/converse`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 

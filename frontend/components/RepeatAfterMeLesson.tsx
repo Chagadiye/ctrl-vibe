@@ -8,13 +8,13 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { Volume2, Mic, MicOff, CheckCircle2, RotateCcw } from "lucide-react";
 import axios from "axios";
+import { API } from "@/lib/utils";
 
 interface RepeatAfterMeLessonProps {
   lesson: Lesson;
   onComplete?: (score: number) => void;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6969";
 
 export default function RepeatAfterMeLesson({ lesson, onComplete }: RepeatAfterMeLessonProps) {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export default function RepeatAfterMeLesson({ lesson, onComplete }: RepeatAfterM
   const generateAudio = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/api/speech/synthesize`, { 
+      const response = await axios.post(`${API}/speech/synthesize`, { 
       text: lesson.content.kannada_phrase, 
       voice: "alloy" 
       });
@@ -96,7 +96,7 @@ useEffect(() => {
       formData.append('audio', audioBlob, 'recording.webm');
       formData.append('original_text', lesson.content.kannada_phrase || '');
 
-      const response = await axios.post(`${API_URL}/api/speech/evaluate`, formData, {
+      const response = await axios.post(`${API}/speech/evaluate`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 

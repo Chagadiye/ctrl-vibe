@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import axios from "axios";
+import { API } from "@/lib/utils";
 
 interface XPStore {
   // User data
@@ -30,8 +31,6 @@ interface XPStore {
   reset: () => void;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6969";
-
 export const useXPStore = create<XPStore>()(
   persist(
     (set, get) => ({
@@ -56,7 +55,7 @@ export const useXPStore = create<XPStore>()(
 
         try {
           set({ loading: true });
-          const response = await axios.post(`${API_URL}/api/user/create-guest`);
+          const response = await axios.post(`${API}/user/create-guest`);
           const { user_id, username, xp, level, streak } = response.data;
           
           set({
@@ -80,7 +79,7 @@ export const useXPStore = create<XPStore>()(
         if (!userId) return;
 
         try {
-          await axios.put(`${API_URL}/api/user/update-username`, {
+          await axios.put(`${API}/user/update-username`, {
             user_id: userId,
             username: newUsername
           });
@@ -100,7 +99,7 @@ export const useXPStore = create<XPStore>()(
 
         try {
           set({ loading: true });
-          const response = await axios.post(`${API_URL}/api/game/submit-lesson`, {
+          const response = await axios.post(`${API}/game/submit-lesson`, {
             user_id: userId,
             ...data
           });
@@ -139,7 +138,7 @@ export const useXPStore = create<XPStore>()(
 
         try {
           set({ loading: true });
-          const response = await axios.get(`${API_URL}/api/user/profile/${userId}`);
+          const response = await axios.get(`${API}/user/profile/${userId}`);
           const userData = response.data;
           
           set({

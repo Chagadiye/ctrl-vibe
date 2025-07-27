@@ -2,8 +2,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { LeaderboardEntry } from "@/lib/types";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6969";
+import { API } from "@/lib/utils";
 
 interface LeaderboardStore {
   entries: LeaderboardEntry[];
@@ -25,7 +24,7 @@ export const useLeaderboardStore = create<LeaderboardStore>((set) => ({
   fetchLeaderboard: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get(`${API_URL}/api/game/leaderboard`);
+      const response = await axios.get(`${API}/game/leaderboard`);
       const { leaderboard, total_players } = response.data;
       
       // Add rank to each entry
@@ -49,7 +48,7 @@ export const useLeaderboardStore = create<LeaderboardStore>((set) => ({
 
   getUserRank: async (userId: string) => {
     try {
-      const response = await axios.get(`${API_URL}/api/game/user/${userId}/progress`);
+      const response = await axios.get(`${API}/game/user/${userId}/progress`);
       const { stats } = response.data;
       set({ userRank: stats.global_rank });
     } catch (error) {

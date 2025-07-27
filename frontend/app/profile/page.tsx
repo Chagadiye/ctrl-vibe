@@ -9,8 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Edit2, Save, X, Trophy, Star, Flame, Target, CheckCircle2 } from "lucide-react";
 import axios from "axios";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6969";
+import { API } from "@/lib/utils";
 
 interface UserStats {
   global_rank: number;
@@ -30,7 +29,7 @@ export default function ProfilePage() {
   const fetchUserProgress = useCallback(async () => {
     if (!userId) return;
     try {
-      const response = await axios.get(`${API_URL}/api/game/user/${userId}/progress`);
+      const response = await axios.get(`${API}/game/user/${userId}/progress`);
       setUserStats(response.data.stats);
     } catch (error) {
       console.error("Error fetching user progress:", error);
