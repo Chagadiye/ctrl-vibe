@@ -45,6 +45,14 @@ def create_app():
         print("✅ user_bp registered successfully")
     except Exception as e:
         print(f"❌ Failed to register user_bp: {e}")
+
+    try:
+        from api.livekit_routes import livekit_bp
+        app.register_blueprint(livekit_bp, url_prefix='/api/livekit')
+        print("✅ LiveKit routes registered")
+    except ImportError as e:
+        print(f"⚠️  LiveKit routes not available: {e}")
+        print("Voice simulations will use fallback mode")
     
     # Initialize MongoDB with error handling
     try:
