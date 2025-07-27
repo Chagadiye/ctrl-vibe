@@ -30,7 +30,7 @@ export default function BenefitsSection() {
   return (
     <section className="bg-background py-20 px-4 text-center">
       <h2 className="text-4xl font-bold mb-12 text-foreground">
-        Why Kannadanibba?
+        Why Kannaḍagottā?
       </h2>
       <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
         {benefits.map((b, idx) => (
