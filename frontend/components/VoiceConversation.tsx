@@ -1,20 +1,21 @@
+// frontend/components/VoiceConversation.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
-  LiveKitRoom, 
-  useVoiceAssistant, 
+import {
+  LiveKitRoom,
+  useVoiceAssistant,
   BarVisualizer,
   RoomAudioRenderer,
   useConnectionState,
   useDataChannel,
-  useTracks
 } from "@livekit/components-react";
-import { ConnectionState, Track } from "livekit-client";
+import { ConnectionState } from "livekit-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mic, MicOff, Phone, PhoneOff } from "lucide-react";
+import { Phone, PhoneOff } from "lucide-react";
 
+// ... (interface VoiceConversationProps remains the same)
 interface VoiceConversationProps {
   token: string;
   serverUrl: string;
@@ -26,7 +27,7 @@ interface VoiceConversationProps {
   };
 }
 
-// Inner component that has access to LiveKit context
+
 function VoiceInterface({ onDisconnect, simulationInfo }: { 
   onDisconnect: () => void; 
   simulationInfo: VoiceConversationProps['simulationInfo'] 
@@ -35,10 +36,9 @@ function VoiceInterface({ onDisconnect, simulationInfo }: {
   const connectionState = useConnectionState();
   const [isConnected, setIsConnected] = useState(false);
   const [transcript, setTranscript] = useState<string[]>([]);
-
-  // Listen for transcription data
+  
   const { message } = useDataChannel();
-
+  
   useEffect(() => {
     if (connectionState === ConnectionState.Connected) {
       setIsConnected(true);
@@ -48,11 +48,15 @@ function VoiceInterface({ onDisconnect, simulationInfo }: {
   useEffect(() => {
     if (message) {
       try {
-        const data = JSON.parse(message);
+        // ++ FIX: Decode the Uint8Array payload to a string before parsing
+        const decoder = new TextDecoder();
+        const jsonString = decoder.decode(message.payload);
+        const data = JSON.parse(jsonString);
+
         if (data.type === 'transcript') {
-          setTranscript(prev => [...prev.slice(-5), data.content]); // Keep last 6 messages
+          setTranscript(prev => [...prev.slice(-5), data.content]);
         }
-      } catch (e) {
+      } catch {
         // Ignore parsing errors
       }
     }
@@ -96,7 +100,7 @@ function VoiceInterface({ onDisconnect, simulationInfo }: {
             </p>
           </div>
           <Button
-            variant="destructive"
+            variant="reverse"
             size="sm"
             onClick={onDisconnect}
             className="flex items-center gap-2"
@@ -175,6 +179,7 @@ function VoiceInterface({ onDisconnect, simulationInfo }: {
     </div>
   );
 }
+
 
 export default function VoiceConversation({ 
   token, 

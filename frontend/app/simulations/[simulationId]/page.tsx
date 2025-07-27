@@ -1,4 +1,3 @@
-// frontend/app/simulations/[simulationId]/page.tsx - No Auth Version
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,23 +6,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Phone, Trophy, AlertCircle } from "lucide-react";
 import VoiceConversation from "@/components/VoiceConversation";
-import DemoVoiceConversation from "@/components/DemoVoiceConversation";
 import axios from "axios";
 import { useXPStore } from "@/store/xpStore";
-import { API } from "@/lib/utils"
-
-// Use direct URL instead of importing API from utils to avoid double path issue
-
-interface SimulationSession {
-  room_name: string;
-  access_token: string;
-  livekit_url: string;
-  simulation: {
-    title: string;
-    description: string;
-    tips: string[];
-  };
-}
+import { API } from "@/lib/utils";
+import { SimulationSession } from "@/lib/types";
 
 export default function SimulationPracticePage() {
   const router = useRouter();
@@ -67,15 +53,20 @@ export default function SimulationPracticePage() {
       
       console.log("✅ Session created:", response.data);
       setSession(response.data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("❌ Full error:", err);
-      console.error("❌ Response data:", err.response?.data);
-      setError(err.response?.data?.error || `Failed to start simulation: ${err.message}`);
+      let errorMessage = "Failed to start simulation.";
+      if (axios.isAxiosError(err)) {
+          console.error("❌ Response data:", err.response?.data);
+          errorMessage = err.response?.data?.error || `Failed to start simulation: ${err.message}`;
+      } else if (err instanceof Error) {
+          errorMessage = err.message;
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
   const endSimulation = async () => {
     if (!session) return;
 
@@ -139,7 +130,7 @@ export default function SimulationPracticePage() {
               <p>📱 Make sure your microphone is working</p>
               <p>🎧 Use headphones for better experience</p>
               <p>🗣️ Speak clearly and naturally</p>
-              <p>💡 Don't worry about perfect pronunciation</p>
+              <p>💡 Don&apos;t worry about perfect pronunciation</p>
             </div>
           </CardContent>
         </Card>
@@ -175,7 +166,7 @@ export default function SimulationPracticePage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-muted-foreground">
-                  You'll have a voice conversation with an AI that plays the role of a {getSimulationTitle()}.
+                  You&apos;ll have a voice conversation with an AI that plays the role of a {getSimulationTitle()}.
                   Speak naturally in Kannada!
                 </p>
                 
@@ -235,7 +226,7 @@ export default function SimulationPracticePage() {
                     Try Another Simulation
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="default"
                     onClick={() => window.location.reload()}
                     className="w-full"
                   >
