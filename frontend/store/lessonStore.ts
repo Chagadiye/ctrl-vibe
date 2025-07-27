@@ -19,7 +19,7 @@ export const useLessonStore = create<LessonStore>((set) => ({
     set({ loading: true, error: null, lesson: null });
     try {
       const response = await axios.get<Track>(
-        `http://localhost:6969/api/tracks/${trackId}`
+        `${API}/tracks/${trackId}`
       );
       const currentLesson = response.data.lessons.find(
         (l) => l.id === lessonId

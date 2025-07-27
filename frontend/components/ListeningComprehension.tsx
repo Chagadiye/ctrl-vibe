@@ -1,4 +1,3 @@
-// frontend/components/ListeningComprehension.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -7,13 +6,12 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Volume2, RefreshCw, CheckCircle2, XCircle } from "lucide-react";
 import axios from "axios";
+import { API } from "@/lib/utils";
 
 interface ListeningComprehensionProps {
   lesson: Lesson;
   onComplete?: (score: number) => void;
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:6969";
 
 export default function ListeningComprehension({ lesson, onComplete }: ListeningComprehensionProps) {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -28,7 +26,7 @@ export default function ListeningComprehension({ lesson, onComplete }: Listening
     
     setLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/api/speech/synthesize`, {
+      const response = await axios.post(`${API}/speech/synthesize`, {
         text: lesson.content.audio_text,
         voice: "alloy"
       });
