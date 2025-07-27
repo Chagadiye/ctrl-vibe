@@ -18,6 +18,7 @@ interface XPStore {
   loading: boolean;
   
   // Actions
+  // Actions
   initUser: () => Promise<void>;
   updateUsername: (username: string) => Promise<void>;
   submitLesson: (data: {
@@ -27,6 +28,7 @@ interface XPStore {
     timeSpent: number;
     answers?: any;
   }) => Promise<any>;
+  addDuelXP: (amount: number) => void; // Add this new action
   loadUserProgress: () => Promise<void>;
   reset: () => void;
 }
@@ -128,6 +130,15 @@ export const useXPStore = create<XPStore>()(
           console.error("Error submitting lesson:", error);
           set({ loading: false });
           throw error;
+        }
+      },
+
+      addDuelXP: (amount: number) => {
+        const state = get();
+        if (state.userId) {
+          const newXP = state.xp + amount;
+          set({ xp: newXP });
+          // The 'persist' middleware will automatically save this to localStorage
         }
       },
 

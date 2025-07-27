@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, send_file
-from core import lesson_manager, simulation_manager
+from core import lesson_manager, simulation_manager, duel_manager
 from services.openai_client import OpenAIService
 from services.content_filter import ContentFilter
 import json
