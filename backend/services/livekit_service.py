@@ -1,4 +1,3 @@
-# backend/services/livekit_service.py - Simplified for demo
 import asyncio
 import logging
 from datetime import datetime, timedelta
