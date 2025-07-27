@@ -92,7 +92,7 @@ export default function SimulationsPage() {
         </div>
 
         {/* Instructions */}
-        <Card className="mb-8 bg-blue-50 border-blue-200">
+        <Card className="mb-8 border-black-200">
           <CardContent className="p-6">
             <h2 className="font-bold text-lg mb-2">How it works:</h2>
             <ul className="list-disc list-inside space-y-1 text-sm">

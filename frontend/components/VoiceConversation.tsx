@@ -91,7 +91,7 @@ function VoiceInterface({ onDisconnect, simulationInfo }: {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b bg-white">
+      <div className="p-4 border-b ">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold">{simulationInfo.title}</h2>
@@ -112,11 +112,11 @@ function VoiceInterface({ onDisconnect, simulationInfo }: {
       </div>
 
       {/* Main Voice Interface */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br ">
         {!isConnected ? (
           <div className="text-center">
-            <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center animate-pulse">
-              <Phone className="h-12 w-12 text-blue-600" />
+            <div className="w-24 h-24 mx-auto mb-4 rounded-full flex items-center justify-center animate-pulse">
+              <Phone className="h-12 w-12 " />
             </div>
             <p className="text-lg text-gray-600">Connecting to your simulation...</p>
           </div>
@@ -165,7 +165,7 @@ function VoiceInterface({ onDisconnect, simulationInfo }: {
       </div>
 
       {/* Tips */}
-      <div className="p-4 bg-gray-50 border-t">
+      <div className="p-4  border-t">
         <h4 className="text-sm font-medium mb-2">💡 Tips:</h4>
         <ul className="text-xs text-gray-600 space-y-1">
           {simulationInfo.tips.map((tip, idx) => (
