@@ -1,4 +1,3 @@
-# backend/api/livekit_routes.py
 from flask import Blueprint, request, jsonify
 from livekit.api import LiveKitAPI, CreateRoomRequest, DeleteRoomRequest, AccessToken, VideoGrants
 import json
